@@ -36,9 +36,23 @@ This is a single git repository ([`snapdev-support/mira-ai`](https://github.com/
                 └─────────────────────────┘
 ```
 
-- A claim has a `jti` and checksum `h = base32(hmac_sha256(jti, TOKEN_HMAC_SECRET))[:10]`. Tokens are encoded as `mira:<jti>.<h>` or as a verify URL.
+- A claim has a `jti` and a checksum `h = base32(hmac_sha256(jti, TOKEN_HMAC_SECRET))[:10].lower()`. A scanned/pasted string is classified as one of: `mira:<jti>.<h>`, a verify URL (`/t/<jti>?h=<h>`), a partner URL (`?mira=<jti>.<h>`), any other URL (treated as third-party), or unknown.
 - The frontend's verify flow is a **PWA** (`start_url: /app/verify`); the service worker is registered at runtime.
 - Auth is email + password → JWT (HS256), stored client-side and attached to every API request.
+
+---
+
+## What's inside
+
+Beyond the core issue/verify loop, the app includes:
+
+- **Verify** — public scan/paste flow returning a deterministic verdict; the authed entry (`/app/verify`) is a PWA.
+- **Issuance & billing** — users mint claims against a free-tier cap; going over triggers a Stripe Checkout top-up for claim credits (over-cap responds `HTTP 402` with a `checkoutUrl`).
+- **Admin console** — a `super_admin` panel (backend [`routers/admin.py`](backend/app/routers/admin.py), frontend [`src/admin/`](frontend/src/admin/)): user management, transactions & refunds, metrics, and an audit log.
+- **Support** — in-app ticketing with an AI help widget and a knowledge base (backend [`routers/support.py`](backend/app/routers/support.py) + `notifications_service.py`; frontend [`src/components/support/`](frontend/src/components/support/) and the `AdminTickets` / `AdminKB*` pages).
+- **Waitlist** — signup capture with an admin review screen ([`routers/waitlist.py`](backend/app/routers/waitlist.py), `WaitlistAdmin.tsx`).
+
+See [`backend/BACKEND-STATUS.md`](backend/BACKEND-STATUS.md) and [`backend/DESIGN-admin-and-chatbot.md`](backend/DESIGN-admin-and-chatbot.md) for full behavior.
 
 ---
 
@@ -71,7 +85,7 @@ pnpm dev
 
 App: `http://localhost:5173`
 
-Configured via `frontend/.env`: `VITE_API_BASE_URL` (defaults to `http://localhost:8000/api/v1`) and `VITE_GOOGLE_CLIENT_ID` for Google OAuth.
+Configured via `frontend/.env`: `VITE_API_BASE_URL` (defaults to `http://localhost:8000/api/v1`), `VITE_GOOGLE_CLIENT_ID` (Google OAuth), and `VITE_STRIPE_PUBLISHABLE_KEY` (Stripe Checkout).
 
 ---
 
