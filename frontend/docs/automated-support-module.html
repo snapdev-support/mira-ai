@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Automated Support System — MiraTrust</title>
+  <style>
+    body {
+      font-family: 'Calibri', 'Segoe UI', Arial, sans-serif;
+      font-size: 11pt;
+      color: #1a1a1a;
+      margin: 72pt 90pt;
+      line-height: 1.6;
+    }
+    h1 {
+      font-size: 22pt;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 4pt;
+      border-bottom: 2px solid #6366f1;
+      padding-bottom: 8pt;
+    }
+    h2 {
+      font-size: 15pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 28pt;
+      margin-bottom: 8pt;
+    }
+    h3 {
+      font-size: 12pt;
+      font-weight: 700;
+      color: #334155;
+      margin-top: 18pt;
+      margin-bottom: 6pt;
+    }
+    p {
+      margin: 6pt 0;
+    }
+    .meta {
+      font-size: 9.5pt;
+      color: #64748b;
+      margin-bottom: 28pt;
+    }
+    .meta span {
+      margin-right: 24pt;
+    }
+    .highlight-box {
+      background: #f0f4ff;
+      border-left: 4px solid #6366f1;
+      padding: 10pt 14pt;
+      margin: 14pt 0;
+      border-radius: 0 4pt 4pt 0;
+    }
+    .highlight-box p {
+      margin: 0;
+      font-size: 10.5pt;
+      color: #1e293b;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 12pt 0;
+      font-size: 10pt;
+    }
+    th {
+      background: #1e293b;
+      color: #ffffff;
+      padding: 8pt 10pt;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 7pt 10pt;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+    }
+    tr:nth-child(even) td {
+      background: #f8fafc;
+    }
+    .layer-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 6pt;
+      padding: 14pt 16pt;
+      margin: 14pt 0;
+    }
+    .layer-card .layer-title {
+      font-size: 13pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 6pt;
+    }
+    .layer-card .layer-badge {
+      display: inline-block;
+      font-size: 8.5pt;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 2pt 7pt;
+      border-radius: 20pt;
+      margin-bottom: 10pt;
+    }
+    .badge-green  { background: #dcfce7; color: #166534; }
+    .badge-blue   { background: #dbeafe; color: #1e40af; }
+    .badge-orange { background: #ffedd5; color: #9a3412; }
+    ul, ol {
+      margin: 6pt 0 6pt 18pt;
+      padding: 0;
+    }
+    li {
+      margin: 4pt 0;
+    }
+    .flow-box {
+      background: #0f172a;
+      color: #e2e8f0;
+      font-family: 'Courier New', monospace;
+      font-size: 9pt;
+      padding: 14pt 18pt;
+      border-radius: 6pt;
+      margin: 14pt 0;
+      line-height: 1.8;
+      white-space: pre;
+    }
+    .status-live {
+      color: #16a34a;
+      font-weight: 600;
+    }
+    .status-coming {
+      color: #d97706;
+      font-weight: 600;
+    }
+    .divider {
+      border: none;
+      border-top: 1px solid #e2e8f0;
+      margin: 28pt 0;
+    }
+    .footer {
+      font-size: 9pt;
+      color: #94a3b8;
+      text-align: center;
+      margin-top: 36pt;
+      padding-top: 12pt;
+      border-top: 1px solid #e2e8f0;
+    }
+    .benefit-grid {
+      display: table;
+      width: 100%;
+      margin: 10pt 0;
+    }
+    .benefit-col {
+      display: table-cell;
+      width: 50%;
+      vertical-align: top;
+      padding-right: 14pt;
+    }
+    .benefit-col:last-child { padding-right: 0; }
+    .benefit-col h4 {
+      font-size: 10.5pt;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 6pt 0;
+    }
+    .benefit-col ul { margin-top: 0; }
+    .tag {
+      display: inline-block;
+      font-size: 8pt;
+      background: #f1f5f9;
+      color: #475569;
+      padding: 1pt 6pt;
+      border-radius: 3pt;
+      margin-right: 4pt;
+      font-family: 'Courier New', monospace;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Title -->
+  <h1>Automated Support System</h1>
+  <div class="meta">
+    <span><strong>Product:</strong> MiraTrust</span>
+    <span><strong>Document Type:</strong> Feature Overview</span>
+    <span><strong>Date:</strong> April 20, 2026</span>
+    <span><strong>Version:</strong> 1.0</span>
+  </div>
+
+  <!-- Executive Summary -->
+  <div class="highlight-box">
+    <p><strong>Goal:</strong> Resolve 99% of user support issues automatically — without hiring support staff. The system operates in three progressive layers, each only activating if the previous layer could not resolve the problem.</p>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Layer Overview -->
+  <h2>1. System Architecture — Three Layers</h2>
+  <p>Every support issue a user faces is routed through three layers in order. A user only reaches the next layer if the current one fails to resolve their issue.</p>
+
+  <div class="flow-box">User encounters a problem
+        │
+        ▼
+┌─────────────────────────────────┐
+│  LAYER 1: Self-Healing Errors   │  ← App explains and fixes silently
+└─────────────────────────────────┘
+        │ Not resolved
+        ▼
+┌─────────────────────────────────┐
+│  LAYER 2: AI Chat Widget        │  ← Claude AI answers instantly
+└─────────────────────────────────┘
+        │ Not resolved
+        ▼
+┌─────────────────────────────────┐
+│  LAYER 3: Human Ticket          │  ← Team follows up by email
+└─────────────────────────────────┘</div>
+
+  <hr class="divider" />
+
+  <!-- Layer 1 -->
+  <h2>2. Layer 1 — Self-Healing Errors</h2>
+
+  <div class="layer-card">
+    <div class="layer-badge badge-green">Fully Automated</div>
+    <div class="layer-title">App diagnoses and explains problems before the user asks for help</div>
+    <p>Whenever an API call fails anywhere in the application, the system maps the technical error code to a plain-English message with a direct action button. Users never see raw error codes.</p>
+    <p>Additionally, a global interceptor watches all API responses. If any request returns a 401 (session expired), it automatically clears the user's session and redirects them to the login page — no component needs to handle this individually.</p>
+  </div>
+
+  <h3>Error Mapping Examples</h3>
+  <table>
+    <tr>
+      <th>Error Condition</th>
+      <th>What the User Sees</th>
+      <th>Action Offered</th>
+    </tr>
+    <tr>
+      <td>Session expired (401)</td>
+      <td>Automatically redirected to login</td>
+      <td>Sign In</td>
+    </tr>
+    <tr>
+      <td>Out of credits (402)</td>
+      <td>"You've run out of credits."</td>
+      <td>Add Credits → /pricing</td>
+    </tr>
+    <tr>
+      <td>No permission (403)</td>
+      <td>"You don't have permission to perform this action."</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Too many requests (429)</td>
+      <td>"You're going too fast. Wait a moment and try again."</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Server error (500)</td>
+      <td>"Something went wrong on our end. We've been notified."</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>No internet connection</td>
+      <td>"Can't reach the server. Check your internet connection."</td>
+      <td>—</td>
+    </tr>
+    <tr>
+      <td>Insufficient credits (domain code)</td>
+      <td>"You need more credits to issue QR codes."</td>
+      <td>Add Credits → /pricing</td>
+    </tr>
+    <tr>
+      <td>QR limit reached (domain code)</td>
+      <td>"You've reached your QR code limit. Upgrade to issue more."</td>
+      <td>View Plans → /pricing</td>
+    </tr>
+  </table>
+
+  <p><strong>Business Impact:</strong> The most common user frustrations — running out of credits and session expiry — are resolved in a single click, with zero support interaction required.</p>
+
+  <hr class="divider" />
+
+  <!-- Layer 2 -->
+  <h2>3. Layer 2 — AI Chat Widget</h2>
+
+  <div class="layer-card">
+    <div class="layer-badge badge-blue">AI-Powered · 24/7</div>
+    <div class="layer-title">Instant answers to any question via a floating chat panel</div>
+    <p>A help button is permanently visible in the bottom-right corner of every authenticated page. Users can ask any question and receive an instant, accurate response powered by Anthropic's Claude AI model.</p>
+  </div>
+
+  <h3>User Experience Flow</h3>
+  <ol>
+    <li>User clicks the floating help button (bottom-right corner)</li>
+    <li>A chat panel opens with a welcome message and four quick-topic shortcuts</li>
+    <li>User clicks a topic or types a custom question</li>
+    <li>AI responds within 2–3 seconds</li>
+    <li>User sees <strong>"Was this helpful?"</strong> (👍 / 👎) after each response</li>
+    <li>If 👍 — conversation can continue or be closed</li>
+    <li>If 👎 — escalation to Layer 3 is offered automatically</li>
+  </ol>
+
+  <h3>Quick Topic Shortcuts</h3>
+  <ul>
+    <li>How do credits work?</li>
+    <li>I can't generate a QR code</li>
+    <li>Payment or billing issue</li>
+    <li>Verification isn't working</li>
+  </ul>
+
+  <h3>AI Knowledge Base</h3>
+  <p>The AI is configured with a custom MiraTrust knowledge base. It will only answer from this information — it will never invent features, prices, or policies.</p>
+
+  <table>
+    <tr>
+      <th>Topic Area</th>
+      <th>What the AI Knows</th>
+    </tr>
+    <tr>
+      <td>Credits</td>
+      <td>How credits work, pricing tiers ($97 / $499 / $999), that they never expire, how to add more</td>
+    </tr>
+    <tr>
+      <td>QR Code Generation</td>
+      <td>Studio section usage, credit consumption, how to troubleshoot generation failures</td>
+    </tr>
+    <tr>
+      <td>Verification</td>
+      <td>How to scan, what scan results mean, counterfeit vs. revoked vs. authentic</td>
+    </tr>
+    <tr>
+      <td>Billing & Payments</td>
+      <td>How to find transaction history, what to do if credits don't appear after payment</td>
+    </tr>
+    <tr>
+      <td>Account & Login</td>
+      <td>Password reset, Google sign-in issues, session management</td>
+    </tr>
+    <tr>
+      <td>Common Errors</td>
+      <td>7 pre-defined issue-and-solution pairs covering the most frequent support requests</td>
+    </tr>
+  </table>
+
+  <h3>Confidence Detection</h3>
+  <p>The system automatically monitors the AI's response for uncertainty. If the AI uses phrases like <em>"I'm not sure"</em>, <em>"I don't know"</em>, or <em>"contact support"</em>, it automatically surfaces the escalation prompt — the user does not need to click 👎 themselves.</p>
+
+  <p><strong>Business Impact:</strong> Common how-to and billing questions are resolved instantly at any time of day with no wait time and no human involvement.</p>
+
+  <hr class="divider" />
+
+  <!-- Layer 3 -->
+  <h2>4. Layer 3 — Human Escalation via Support Ticket</h2>
+
+  <div class="layer-card">
+    <div class="layer-badge badge-orange">Human-Assisted</div>
+    <div class="layer-title">Only genuinely complex issues reach a person — with full context already captured</div>
+    <p>When the AI cannot resolve an issue, it offers to create a support ticket. The entire conversation history is saved automatically so the support agent has complete context before they even send a single reply.</p>
+  </div>
+
+  <h3>Trigger Conditions</h3>
+  <ul>
+    <li>User clicks 👎 on an AI response</li>
+    <li>AI detects its own uncertainty (automatic, no user action required)</li>
+    <li>AI backend fails to connect (graceful fallback)</li>
+  </ul>
+
+  <h3>Ticket Creation Flow</h3>
+  <ol>
+    <li>Escalation prompt is shown: <em>"Sorry I couldn't fully help. Want to create a support ticket? A team member will follow up by email."</em></li>
+    <li>User clicks <strong>Create Ticket</strong></li>
+    <li>System generates a unique ticket reference (e.g. <span class="tag">tkt_a3f9b2c1d4</span>)</li>
+    <li>Full conversation history is saved to the database</li>
+    <li>User's email is captured automatically from their account</li>
+    <li>Confirmation is shown: <em>"Ticket created · Ref: tkt_a3f9b2c1d4. We'll follow up by email soon."</em></li>
+  </ol>
+
+  <h3>What Gets Saved Per Ticket</h3>
+  <table>
+    <tr>
+      <th>Field</th>
+      <th>Value</th>
+      <th>Source</th>
+    </tr>
+    <tr>
+      <td>Ticket ID</td>
+      <td>Unique reference, e.g. tkt_a3f9b2c1d4</td>
+      <td>Auto-generated</td>
+    </tr>
+    <tr>
+      <td>Original Message</td>
+      <td>User's first question</td>
+      <td>Chat widget</td>
+    </tr>
+    <tr>
+      <td>Full Conversation</td>
+      <td>Complete chat history (all messages)</td>
+      <td>Chat widget</td>
+    </tr>
+    <tr>
+      <td>User Email</td>
+      <td>Account email address</td>
+      <td>Auto-captured from JWT token</td>
+    </tr>
+    <tr>
+      <td>Status</td>
+      <td>open / resolved</td>
+      <td>System</td>
+    </tr>
+    <tr>
+      <td>Created At</td>
+      <td>Timestamp (UTC)</td>
+      <td>System</td>
+    </tr>
+  </table>
+
+  <p><strong>Business Impact:</strong> Support agents receive full context before they reply — no back-and-forth needed to understand the problem. Resolution time is significantly reduced.</p>
+
+  <hr class="divider" />
+
+  <!-- Technical Stack -->
+  <h2>5. Technical Components</h2>
+
+  <table>
+    <tr>
+      <th>Component</th>
+      <th>File / Location</th>
+      <th>Technology</th>
+      <th>Purpose</th>
+    </tr>
+    <tr>
+      <td>Error Suggestion Map</td>
+      <td><span class="tag">src/lib/errorMessages.ts</span></td>
+      <td>TypeScript</td>
+      <td>Maps error codes to user messages</td>
+    </tr>
+    <tr>
+      <td>Global 401 Interceptor</td>
+      <td><span class="tag">src/services/api.ts</span></td>
+      <td>Axios</td>
+      <td>Auto session expiry handling</td>
+    </tr>
+    <tr>
+      <td>Chat Widget</td>
+      <td><span class="tag">src/components/support/HelpWidget.tsx</span></td>
+      <td>React</td>
+      <td>Floating UI, conversation management</td>
+    </tr>
+    <tr>
+      <td>Support API Client</td>
+      <td><span class="tag">src/services/supportApi.ts</span></td>
+      <td>TypeScript</td>
+      <td>Chat and ticket API calls</td>
+    </tr>
+    <tr>
+      <td>Support Router</td>
+      <td><span class="tag">app/routers/support.py</span></td>
+      <td>FastAPI</td>
+      <td>HTTP endpoints for chat and tickets</td>
+    </tr>
+    <tr>
+      <td>Support Service</td>
+      <td><span class="tag">app/services/support_service.py</span></td>
+      <td>Python + httpx</td>
+      <td>Claude API integration, ticket storage</td>
+    </tr>
+    <tr>
+      <td>Ticket Storage</td>
+      <td><span class="tag">support_tickets</span> collection</td>
+      <td>MongoDB Atlas</td>
+      <td>Persistent ticket and conversation storage</td>
+    </tr>
+    <tr>
+      <td>AI Model</td>
+      <td>Anthropic API</td>
+      <td>Claude 3.5 Haiku</td>
+      <td>FAQ responses (fast, cost-effective)</td>
+    </tr>
+  </table>
+
+  <hr class="divider" />
+
+  <!-- API Endpoints -->
+  <h2>6. API Endpoints</h2>
+
+  <table>
+    <tr>
+      <th>Method</th>
+      <th>Endpoint</th>
+      <th>Purpose</th>
+      <th>Auth Required</th>
+    </tr>
+    <tr>
+      <td>POST</td>
+      <td><span class="tag">/api/v1/support/chat</span></td>
+      <td>Send message, receive AI response</td>
+      <td>No (public)</td>
+    </tr>
+    <tr>
+      <td>POST</td>
+      <td><span class="tag">/api/v1/support/ticket</span></td>
+      <td>Create support ticket with conversation</td>
+      <td>No (email auto-captured if logged in)</td>
+    </tr>
+  </table>
+
+  <hr class="divider" />
+
+  <!-- Benefits -->
+  <h2>7. Business Benefits</h2>
+
+  <div class="benefit-grid">
+    <div class="benefit-col">
+      <h4>For Users</h4>
+      <ul>
+        <li>No waiting — issues resolved instantly</li>
+        <li>Available 24 hours a day, 7 days a week</li>
+        <li>Context-aware answers specific to MiraTrust</li>
+        <li>No need to search for a support email</li>
+        <li>Full conversation saved — no need to repeat themselves</li>
+      </ul>
+    </div>
+    <div class="benefit-col">
+      <h4>For the Business</h4>
+      <ul>
+        <li>No support staff needed at launch</li>
+        <li>Only genuinely complex issues reach a human</li>
+        <li>Human agents have full context before responding</li>
+        <li>Knowledge base improves over time as FAQs evolve</li>
+        <li>Cost per support interaction is near zero</li>
+      </ul>
+    </div>
+  </div>
+
+  <hr class="divider" />
+
+  <!-- Roadmap -->
+  <h2>8. Current Status &amp; Roadmap</h2>
+
+  <table>
+    <tr>
+      <th>Feature</th>
+      <th>Status</th>
+    </tr>
+    <tr>
+      <td>Self-healing error messages (all pages)</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>Global session expiry handling</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>AI chat widget (all authenticated pages)</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>Quick topic shortcuts</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>Confidence detection &amp; auto-escalation</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>Support ticket creation with conversation history</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>Ticket storage in MongoDB Atlas</td>
+      <td><span class="status-live">✓ Live</span></td>
+    </tr>
+    <tr>
+      <td>Email notification to team on new ticket</td>
+      <td><span class="status-coming">Planned — Phase 2</span></td>
+    </tr>
+    <tr>
+      <td>Admin dashboard to view and manage tickets</td>
+      <td><span class="status-coming">Planned — Phase 2</span></td>
+    </tr>
+    <tr>
+      <td>Email notification to user when ticket is resolved</td>
+      <td><span class="status-coming">Planned — Phase 2</span></td>
+    </tr>
+    <tr>
+      <td>Support analytics (most common questions)</td>
+      <td><span class="status-coming">Planned — Phase 3</span></td>
+    </tr>
+  </table>
+
+  <hr class="divider" />
+
+  <div class="footer">
+    MiraTrust — Automated Support Module · Prepared April 2026 · Confidential
+  </div>
+
+</body>
+</html>

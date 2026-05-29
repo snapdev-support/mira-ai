@@ -1,0 +1,196 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ── Surfaces ── */
+    --color-bg:         #0E0F13;
+    --color-bg-card:    #16181F;
+    --color-bg-light:   #1C1E28;
+    --color-border:     #2A2D3A;
+    --color-divider:    #252733;
+
+    /* ── Text ── */
+    --color-text:       #F5F4F0;
+    --color-muted:      #7A7D8C;
+
+    /* ── Accent ── */
+    --color-accent:     #B5C45A;
+    --color-accent-dim: #7A843A;
+
+    /* ── Accent foreground (text on accent buttons) ── */
+    --color-accent-fg:  #0E0F13;
+
+    /* ── Accent alpha helpers ── */
+    --color-accent-8:   rgba(181, 196, 90, 0.08);
+    --color-accent-16:  rgba(181, 196, 90, 0.16);
+    --color-accent-20:  rgba(181, 196, 90, 0.20);
+    --color-accent-40:  rgba(181, 196, 90, 0.40);
+
+    /* ── Verdict states ONLY ── */
+    --color-safe:       #4CAF7D;
+    --color-warn:       #E6A817;
+    --color-danger:     #D95050;
+
+    /* ── Radius ── */
+    --radius-card:      3px;
+    --radius-sm:        2px;
+    --radius-btn:       4px;
+    --radius:           4px;
+
+    /* ── Typography ── */
+    --font-display:     'GT America', 'Neue Haas Grotesk Display', 'Söhne', 'Aeonik', system-ui, sans-serif;
+    --font-body:        var(--font-display);
+    --font-mono:        'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+    --font-serif:       'Georgia', 'Times New Roman', serif;
+
+    /* ── shadcn/ui compatibility tokens ── */
+    --background:       14 15% 7%;    /* #0E0F13 */
+    --foreground:       40 13% 95%;   /* #F5F4F0 */
+    --card:             220 14% 11%;  /* #16181F */
+    --card-foreground:  40 13% 95%;
+    --popover:          220 14% 11%;
+    --popover-foreground: 40 13% 95%;
+    --primary:          72 40% 56%;   /* #B5C45A */
+    --primary-foreground: 14 15% 7%;
+    --secondary:        225 16% 14%;  /* #1C1E28 */
+    --secondary-foreground: 40 13% 95%;
+    --muted:            225 16% 14%;
+    --muted-foreground: 228 7% 51%;   /* #7A7D8C */
+    --accent:           72 40% 56%;
+    --accent-foreground: 14 15% 7%;
+    --destructive:      0 60% 57%;    /* #D95050 */
+    --destructive-foreground: 40 13% 95%;
+    --border:           228 14% 20%;  /* #2A2D3A */
+    --input:            228 14% 20%;
+    --ring:             72 40% 56%;   /* #B5C45A */
+
+    /* ── Sidebar ── */
+    --sidebar-background: 220 14% 11%;
+    --sidebar-foreground: 40 13% 95%;
+    --sidebar-primary:    72 40% 56%;
+    --sidebar-primary-foreground: 14 15% 7%;
+    --sidebar-accent:     225 16% 14%;
+    --sidebar-accent-foreground: 40 13% 95%;
+    --sidebar-border:     228 14% 20%;
+    --sidebar-ring:       72 40% 56%;
+  }
+
+  /* ── Light mode overrides ── */
+  html.light {
+    --color-bg:         #F5F6FA;
+    --color-bg-card:    #FFFFFF;
+    --color-bg-light:   #ECEEF5;
+    --color-border:     #D5D8E4;
+    --color-divider:    #DDE1EE;
+    --color-text:       #0E0F13;
+    --color-muted:      #5A5D6B;
+    --color-accent:     #627A1E;
+    --color-accent-dim: #4A5E16;
+
+    --color-accent-fg:  #FFFFFF;
+
+    --color-accent-8:   rgba(98, 122, 30, 0.08);
+    --color-accent-16:  rgba(98, 122, 30, 0.16);
+    --color-accent-20:  rgba(98, 122, 30, 0.20);
+    --color-accent-40:  rgba(98, 122, 30, 0.40);
+
+    --background:       230 18% 97%;
+    --foreground:       228 14% 7%;
+    --card:             0 0% 100%;
+    --card-foreground:  228 14% 7%;
+    --popover:          0 0% 100%;
+    --popover-foreground: 228 14% 7%;
+    --primary:          76 60% 30%;
+    --primary-foreground: 0 0% 100%;
+    --secondary:        228 18% 94%;
+    --secondary-foreground: 228 14% 7%;
+    --muted:            228 18% 94%;
+    --muted-foreground: 228 10% 39%;
+    --accent:           76 60% 30%;
+    --accent-foreground: 0 0% 100%;
+    --border:           228 15% 85%;
+    --input:            228 15% 85%;
+    --ring:             76 60% 30%;
+
+    --sidebar-background: 230 18% 97%;
+    --sidebar-foreground: 228 14% 7%;
+    --sidebar-primary:    76 60% 30%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent:     228 18% 94%;
+    --sidebar-accent-foreground: 228 14% 7%;
+    --sidebar-border:     228 15% 85%;
+    --sidebar-ring:       76 60% 30%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html,
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'GT America', 'Neue Haas Grotesk Display', 'Söhne', 'Aeonik', system-ui, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'GT America', 'Neue Haas Grotesk Display', 'Söhne', 'Aeonik', system-ui, sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  h1 { font-size: clamp(48px, 5vw, 56px); line-height: 1.05; }
+  h2 { font-size: clamp(36px, 4vw, 40px); letter-spacing: -0.01em; }
+  h3 { font-size: clamp(24px, 2.5vw, 28px); font-weight: 600; letter-spacing: 0; }
+  body { font-size: 15px; font-weight: 400; line-height: 1.6; }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dim));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .label-caps {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: var(--color-muted);
+  }
+}
+
+@keyframes accordion-down {
+  from { height: 0; }
+  to { height: var(--radix-accordion-content-height); }
+}
+
+@keyframes accordion-up {
+  from { height: var(--radix-accordion-content-height); }
+  to { height: 0; }
+}

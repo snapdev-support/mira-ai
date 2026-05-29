@@ -1,0 +1,373 @@
+/*
+  Admin Console — Operator Terminal theme.
+
+  Locked-in palette and typography for /admin/*. Scoped behind .admin-shell
+  so customer-facing routes are unaffected. Every CSS variable is named so
+  it can be swapped later without rewriting components.
+
+  Aesthetic checklist (frontend-design skill):
+    - Mono-only typography (JetBrains Mono)
+    - Near-black bg, dominant amber accent, sparing red for critical
+    - Zero rounded corners (sharp HUD edges)
+    - Visible 1px grid + hairline rules
+    - Generous letter-spacing on headings; uppercase tags
+    - No purple, no gradients, no soft shadows
+*/
+
+.admin-shell {
+  /* Palette — Bloomberg amber on graphite */
+  --term-bg: #050608;
+  --term-bg-1: #0b0d10;        /* one step up — panel surface */
+  --term-bg-2: #11141a;        /* two steps up — hover surface */
+  --term-grid: #1a1f27;        /* grid line color */
+  --term-rule: #232a33;        /* hairline border */
+  --term-rule-strong: #3a4452;
+
+  --term-fg: #d8d4c8;          /* primary text (ivory-on-graphite) */
+  --term-fg-dim: #8a8579;      /* secondary text */
+  --term-fg-mute: #5a564c;     /* tertiary text / labels */
+
+  --term-amber: #f5a623;       /* dominant accent */
+  --term-amber-soft: #b87c1e;
+  --term-amber-faint: rgba(245, 166, 35, 0.08);
+
+  --term-red: #ef3a35;         /* critical / destructive */
+  --term-red-faint: rgba(239, 58, 53, 0.10);
+  --term-green: #5ee382;       /* succeeded / open-positive */
+  --term-green-faint: rgba(94, 227, 130, 0.10);
+  --term-blue: #5fb2ff;        /* informational */
+
+  /* Typography */
+  --term-font: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  font-family: var(--term-font);
+  font-feature-settings: "ss02", "ss03", "cv11", "zero";
+  background: var(--term-bg);
+  color: var(--term-fg);
+  min-height: 100vh;
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  /* Subtle scanline texture — purely decorative, very low opacity */
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.012) 0px,
+      rgba(255, 255, 255, 0.012) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+}
+
+.admin-shell *,
+.admin-shell *::before,
+.admin-shell *::after {
+  box-sizing: border-box;
+  border-radius: 0 !important;     /* enforce no rounded corners */
+  font-family: var(--term-font);
+}
+
+/* ── Selection ─────────────────────────────────────────────────────────── */
+
+.admin-shell ::selection {
+  background: var(--term-amber);
+  color: var(--term-bg);
+}
+
+/* ── Scrollbar (webkit) ────────────────────────────────────────────────── */
+
+.admin-shell *::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.admin-shell *::-webkit-scrollbar-track {
+  background: var(--term-bg);
+}
+.admin-shell *::-webkit-scrollbar-thumb {
+  background: var(--term-rule-strong);
+  border: 2px solid var(--term-bg);
+}
+.admin-shell *::-webkit-scrollbar-thumb:hover {
+  background: var(--term-amber-soft);
+}
+
+/* ── Reusable atoms ────────────────────────────────────────────────────── */
+
+.admin-shell .t-rule {
+  border: 0;
+  border-top: 1px solid var(--term-rule);
+  margin: 0;
+}
+.admin-shell .t-rule-strong {
+  border: 0;
+  border-top: 1px solid var(--term-rule-strong);
+}
+
+.admin-shell .t-label {
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--term-fg-mute);
+}
+
+.admin-shell .t-h1 {
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--term-fg);
+  margin: 0;
+}
+
+.admin-shell .t-h2 {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  color: var(--term-fg);
+  margin: 0;
+}
+
+.admin-shell .t-mono-amber {
+  color: var(--term-amber);
+}
+.admin-shell .t-mono-dim {
+  color: var(--term-fg-dim);
+}
+.admin-shell .t-mono-mute {
+  color: var(--term-fg-mute);
+}
+
+/* Inline tag — e.g. STATUS  ID  EMAIL column heads */
+.admin-shell .t-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  border: 1px solid var(--term-rule);
+  background: transparent;
+  color: var(--term-fg-dim);
+}
+.admin-shell .t-tag[data-tone="amber"] {
+  border-color: var(--term-amber-soft);
+  color: var(--term-amber);
+  background: var(--term-amber-faint);
+}
+.admin-shell .t-tag[data-tone="red"] {
+  border-color: var(--term-red);
+  color: var(--term-red);
+  background: var(--term-red-faint);
+}
+.admin-shell .t-tag[data-tone="green"] {
+  border-color: var(--term-green);
+  color: var(--term-green);
+  background: var(--term-green-faint);
+}
+.admin-shell .t-tag[data-tone="mute"] {
+  border-color: var(--term-rule);
+  color: var(--term-fg-mute);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────────────── */
+
+.admin-shell .t-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 7px 14px;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--term-fg);
+  border: 1px solid var(--term-rule-strong);
+  cursor: pointer;
+  transition: background 80ms linear, color 80ms linear, border-color 80ms linear;
+}
+.admin-shell .t-btn:hover:not(:disabled) {
+  background: var(--term-bg-2);
+  border-color: var(--term-amber);
+  color: var(--term-amber);
+}
+.admin-shell .t-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.admin-shell .t-btn[data-primary="true"] {
+  border-color: var(--term-amber);
+  color: var(--term-amber);
+  background: var(--term-amber-faint);
+}
+.admin-shell .t-btn[data-primary="true"]:hover:not(:disabled) {
+  background: var(--term-amber);
+  color: var(--term-bg);
+}
+.admin-shell .t-btn[data-tone="red"] {
+  border-color: var(--term-red);
+  color: var(--term-red);
+}
+.admin-shell .t-btn[data-tone="red"]:hover:not(:disabled) {
+  background: var(--term-red);
+  color: var(--term-bg);
+}
+
+/* ── Inputs ────────────────────────────────────────────────────────────── */
+
+.admin-shell .t-input {
+  width: 100%;
+  background: var(--term-bg-1);
+  border: 1px solid var(--term-rule);
+  color: var(--term-fg);
+  font-family: var(--term-font);
+  font-size: 13px;
+  padding: 9px 12px;
+  outline: none;
+  transition: border-color 80ms linear;
+}
+.admin-shell .t-input:focus {
+  border-color: var(--term-amber);
+  box-shadow: inset 0 0 0 1px var(--term-amber);
+}
+.admin-shell .t-input::placeholder {
+  color: var(--term-fg-mute);
+}
+.admin-shell textarea.t-input {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.55;
+}
+
+/* ── Tables ────────────────────────────────────────────────────────────── */
+
+.admin-shell .t-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.admin-shell .t-table th {
+  text-align: left;
+  font-weight: 500;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--term-fg-mute);
+  padding: 9px 14px;
+  border-bottom: 1px solid var(--term-rule);
+  background: var(--term-bg);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+.admin-shell .t-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--term-rule);
+  color: var(--term-fg);
+  vertical-align: middle;
+}
+.admin-shell .t-table tbody tr {
+  transition: background 80ms linear;
+}
+.admin-shell .t-table tbody tr:hover {
+  background: var(--term-bg-1);
+}
+.admin-shell .t-table tbody tr[data-href] {
+  cursor: pointer;
+}
+
+/* ── Cards / panels ────────────────────────────────────────────────────── */
+
+.admin-shell .t-panel {
+  background: var(--term-bg-1);
+  border: 1px solid var(--term-rule);
+}
+.admin-shell .t-panel-header {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--term-rule);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+.admin-shell .t-panel-body {
+  padding: 16px;
+}
+
+/* ── Status-bar header ─────────────────────────────────────────────────── */
+
+.admin-shell .t-statusbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  background: var(--term-bg);
+  border-bottom: 1px solid var(--term-rule-strong);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--term-fg-dim);
+  text-transform: uppercase;
+}
+.admin-shell .t-statusbar .brand {
+  color: var(--term-amber);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+}
+
+/* ── Animated cursor caret (login screen flourish) ────────────────────── */
+
+@keyframes term-blink {
+  0%, 49% { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+.admin-shell .t-caret::after {
+  content: "_";
+  display: inline-block;
+  margin-left: 4px;
+  color: var(--term-amber);
+  animation: term-blink 1100ms steps(1, end) infinite;
+}
+
+/* ── Grid background — used on the AdminHome canvas ────────────────────── */
+
+.admin-shell .t-grid-bg {
+  background-image:
+    linear-gradient(var(--term-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--term-grid) 1px, transparent 1px);
+  background-size: 32px 32px;
+  background-position: -1px -1px;
+}
+
+/* ── Focus ring for keyboard navigation ────────────────────────────────── */
+
+.admin-shell :focus-visible {
+  outline: 1px dashed var(--term-amber);
+  outline-offset: 2px;
+}
+
+/* ── Loading shimmer ──────────────────────────────────────────────────── */
+
+@keyframes term-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.7; }
+}
+.admin-shell .t-loading {
+  color: var(--term-amber);
+  animation: term-pulse 1100ms ease-in-out infinite;
+}
+
+/* ── Stagger reveal on page mount (subtle) ─────────────────────────────── */
+
+@keyframes term-fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+.admin-shell .t-reveal {
+  animation: term-fade-in 220ms ease-out both;
+}
+.admin-shell .t-reveal[data-delay="1"] { animation-delay: 60ms; }
+.admin-shell .t-reveal[data-delay="2"] { animation-delay: 120ms; }
+.admin-shell .t-reveal[data-delay="3"] { animation-delay: 180ms; }
+.admin-shell .t-reveal[data-delay="4"] { animation-delay: 240ms; }

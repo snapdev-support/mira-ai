@@ -1,0 +1,31 @@
+# Claude Code local config (machine-specific; may contain secrets/tokens)
+.claude/
+CLAUDE.local.md
+
+# Environment / secrets (defense-in-depth; subdirs also ignore these)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Dependencies / build artifacts
+node_modules/
+.venv/
+venv/
+dist/
+dist-ssr/
+dev-dist/
+build/
+__pycache__/
+*.py[cod]
+
+# Logs
+*.log
+logs/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.idea/
+*.swp
