@@ -12,4 +12,5 @@ stripe>=8.0
 python-multipart>=0.0.9
 httpx>=0.27
 anthropic>=0.69
+groq>=0.11
 sendgrid>=6.11

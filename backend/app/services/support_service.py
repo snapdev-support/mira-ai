@@ -83,6 +83,47 @@ def _get_client() -> Optional[anthropic.AsyncAnthropic]:
     return _client
 
 
+# ── Groq client ──────────────────────────────────────────────────────────
+
+# Imported lazily so the package is only required when chat_provider="groq".
+# Typed as Any to avoid importing the groq package at module load.
+_groq_client: Optional[Any] = None
+
+
+def _get_groq_client() -> Optional[Any]:
+    global _groq_client
+    if _groq_client is not None:
+        return _groq_client
+    if not settings.groq_api_key:
+        return None
+    try:
+        from groq import AsyncGroq
+    except ImportError:
+        logger.error("support.chat[groq] groq package not installed; run pip install groq")
+        return None
+    _groq_client = AsyncGroq(api_key=settings.groq_api_key)
+    return _groq_client
+
+
+def _tools_to_openai(tools: list[dict]) -> list[dict]:
+    """
+    Translate our Anthropic-shaped tool schemas into OpenAI/Groq function
+    schemas. Same name/description/JSON-schema — only the envelope differs
+    (`input_schema` → `function.parameters`). The executors are untouched.
+    """
+    return [
+        {
+            "type": "function",
+            "function": {
+                "name": t["name"],
+                "description": t["description"],
+                "parameters": t["input_schema"],
+            },
+        }
+        for t in tools
+    ]
+
+
 # ── Knowledge base ─────────────────────────────────────────────────────────
 
 
@@ -453,13 +494,14 @@ def _normalize_assistant_content(content: list) -> list[dict]:
 # ── Streaming agentic loop ─────────────────────────────────────────────────
 
 
-async def stream_chat(
+async def _stream_chat_anthropic(
     message: str,
     history: list[dict],
     user_id: Optional[str] = None,
 ) -> AsyncIterator[dict]:
     """
-    Run the agentic loop and yield SSE-style event dicts.
+    Anthropic (Claude) backend for the agentic loop. Yields SSE-style event
+    dicts. Selected when settings.chat_provider != "groq".
 
     Yields events of the form:
         {"type": "token", "delta": "..."}
@@ -645,6 +687,198 @@ async def stream_chat(
     except Exception as exc:
         logger.exception("support.chat unexpected_error: %s", exc)
         yield {"type": "error", "message": _FALLBACK_ERROR}
+
+
+# ── Groq streaming agentic loop ────────────────────────────────────────────
+
+
+async def _stream_chat_groq(
+    message: str,
+    history: list[dict],
+    user_id: Optional[str] = None,
+) -> AsyncIterator[dict]:
+    """
+    Groq (open-source model) backend for the agentic loop. Selected when
+    settings.chat_provider == "groq". Yields the SAME event dicts as the
+    Anthropic backend so the router and frontend are provider-agnostic.
+
+    Differences from the Anthropic path, all internal:
+      - System prompt is a single OpenAI `system` message (persona + KB),
+        not a list of cache-controlled blocks (Groq has no prompt caching).
+      - Tools use OpenAI function schemas (see `_tools_to_openai`).
+      - The tool loop speaks OpenAI's `tool_calls` / `tool`-role protocol:
+        each round the assistant turn echoes its tool_calls, then one
+        `{"role": "tool", ...}` message per result feeds back in.
+      - Streamed tool_calls arrive fragmented; we accumulate them by index.
+    """
+    client = _get_groq_client()
+    if client is None:
+        yield {"type": "token", "delta": _FALLBACK_OFFLINE}
+        yield {"type": "done", "confident": False, "final_text": _FALLBACK_OFFLINE}
+        return
+
+    articles = await _load_kb_articles()
+    kb_text = _format_kb(articles)
+    persona = _PERSONA_AUTHED if user_id else _PERSONA_ANON
+
+    # OpenAI-style messages: one system turn carries persona + KB.
+    messages: list[dict] = [{"role": "system", "content": f"{persona}\n\n{kb_text}"}]
+    messages.extend(_trim_history(history))
+    messages.append({"role": "user", "content": message})
+
+    tools = _tools_to_openai(_TOOL_SCHEMAS) if user_id else None
+
+    tool_was_called = False
+    final_text_parts: list[str] = []
+
+    try:
+        for iteration in range(MAX_TOOL_ITERATIONS):
+            iteration_text_parts: list[str] = []
+            # Streamed tool_calls come in fragments keyed by their `index`;
+            # id + name land on the first fragment, arguments stream after.
+            tool_calls_acc: dict[int, dict] = {}
+            finish_reason: Optional[str] = None
+
+            create_kwargs: dict[str, Any] = {
+                "model": settings.groq_model,
+                "max_tokens": MAX_OUTPUT_TOKENS,
+                "messages": messages,
+                "stream": True,
+            }
+            if tools:
+                create_kwargs["tools"] = tools
+                create_kwargs["tool_choice"] = "auto"
+
+            stream = await client.chat.completions.create(**create_kwargs)
+            async for chunk in stream:
+                if not chunk.choices:
+                    continue
+                choice = chunk.choices[0]
+                if choice.finish_reason:
+                    finish_reason = choice.finish_reason
+                delta = choice.delta
+                if delta is None:
+                    continue
+                if delta.content:
+                    iteration_text_parts.append(delta.content)
+                    yield {"type": "token", "delta": delta.content}
+                for tc in delta.tool_calls or []:
+                    slot = tool_calls_acc.setdefault(
+                        tc.index, {"id": None, "name": None, "args": ""}
+                    )
+                    if tc.id:
+                        slot["id"] = tc.id
+                    if tc.function:
+                        if tc.function.name:
+                            slot["name"] = tc.function.name
+                        if tc.function.arguments:
+                            slot["args"] += tc.function.arguments
+
+            logger.info(
+                "support.chat[groq] iter=%d finish=%s tools=%d model=%s",
+                iteration,
+                finish_reason,
+                len(tool_calls_acc),
+                settings.groq_model,
+            )
+
+            final_text_parts.extend(iteration_text_parts)
+
+            if finish_reason != "tool_calls" or not tool_calls_acc:
+                # No tool calls requested — we're done.
+                break
+
+            # Echo the assistant's tool_calls turn (required before tool
+            # results), then run each tool and append its result message.
+            ordered = [tool_calls_acc[i] for i in sorted(tool_calls_acc)]
+            assistant_tool_calls = [
+                {
+                    "id": c["id"] or f"call_{iteration}_{n}",
+                    "type": "function",
+                    "function": {
+                        "name": c["name"] or "",
+                        "arguments": c["args"] or "{}",
+                    },
+                }
+                for n, c in enumerate(ordered)
+            ]
+            messages.append(
+                {
+                    "role": "assistant",
+                    "content": "".join(iteration_text_parts) or None,
+                    "tool_calls": assistant_tool_calls,
+                }
+            )
+
+            import json as _json
+
+            for c, tc_msg in zip(ordered, assistant_tool_calls):
+                tool_was_called = True
+                name = c["name"] or ""
+                try:
+                    args = _json.loads(c["args"]) if c["args"] else {}
+                except Exception:
+                    args = {}
+                logger.info(
+                    "support.chat[groq] tool_call name=%s user_id=%s",
+                    name,
+                    user_id or "anon",
+                )
+                result, _is_error = await _execute_tool(user_id or "", name, args)
+                messages.append(
+                    {
+                        "role": "tool",
+                        "tool_call_id": tc_msg["id"],
+                        "content": _coerce_tool_content(result),
+                    }
+                )
+        else:
+            # Hit MAX_TOOL_ITERATIONS without a terminal turn.
+            logger.warning("support.chat[groq] loop_limit_hit user_id=%s", user_id or "anon")
+            final_text_parts = [_FALLBACK_LOOP_LIMIT]
+            yield {"type": "token", "delta": _FALLBACK_LOOP_LIMIT}
+            yield {"type": "done", "confident": False, "final_text": _FALLBACK_LOOP_LIMIT}
+            return
+
+        final_text = "".join(final_text_parts).strip()
+        if not final_text:
+            final_text = "I'm not sure how to answer that — would you like me to create a support ticket?"
+            yield {"type": "token", "delta": final_text}
+
+        yield {
+            "type": "done",
+            "confident": _is_confident(final_text, tool_was_called),
+            "final_text": final_text,
+        }
+
+    except Exception as exc:
+        # groq.APIError / APIConnectionError and anything else map to the same
+        # offline fallback the Anthropic path surfaces — the widget degrades
+        # to "create a ticket" rather than erroring out.
+        logger.exception("support.chat[groq] error: %s", exc)
+        yield {"type": "error", "message": _FALLBACK_OFFLINE}
+
+
+# ── Provider dispatch ──────────────────────────────────────────────────────
+
+
+async def stream_chat(
+    message: str,
+    history: list[dict],
+    user_id: Optional[str] = None,
+) -> AsyncIterator[dict]:
+    """
+    Provider-agnostic entry point used by the router. Dispatches to the
+    Groq or Anthropic backend based on settings.chat_provider. Both yield the
+    identical event contract:
+        {"type": "token", "delta": "..."}
+        {"type": "done", "confident": bool, "final_text": "..."}
+        {"type": "error", "message": "..."}
+    """
+    provider = (settings.chat_provider or "anthropic").strip().lower()
+    backend = _stream_chat_groq if provider == "groq" else _stream_chat_anthropic
+    async for event in backend(message, history, user_id=user_id):
+        yield event
 
 
 def _coerce_tool_content(result: Any) -> str:

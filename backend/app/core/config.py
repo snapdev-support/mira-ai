@@ -63,8 +63,22 @@ class Settings(BaseSettings):
 
     free_tier_issue_cap: int = 100
 
-    # Anthropic — used for the automated support chat widget
+    # ── Support chat model provider ─────────────────────────────────────
+    # Which LLM backend the /support/chat widget talks to. "anthropic" keeps
+    # the Claude path; "groq" routes to an open-source model (Llama, etc.)
+    # via Groq's OpenAI-compatible API. The SSE contract is identical either
+    # way, so flipping this needs no code change.
+    chat_provider: str = "anthropic"
+
+    # Anthropic — used when chat_provider == "anthropic".
     anthropic_api_key: Optional[str] = None
+
+    # Groq — used when chat_provider == "groq". Open-source models served on
+    # Groq's LPUs. Without a key the chat returns the offline fallback (same
+    # as a missing Anthropic key). groq_model accepts any model id Groq
+    # serves; the default is their strongest open-source tool-use model.
+    groq_api_key: Optional[str] = None
+    groq_model: str = "llama-3.3-70b-versatile"
 
     # Rate limits for /support/chat. Authed callers are bucketed per user,
     # anonymous callers per remote IP. Sliding window of `chat_rate_window_s`
