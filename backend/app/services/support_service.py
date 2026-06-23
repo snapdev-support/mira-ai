@@ -44,7 +44,10 @@ KEY SECTIONS
 RESPONSE STYLE
 - Be concise: 2-4 sentences unless the question genuinely needs more.
 - Be specific: name the section, button, or page.
-- Be honest: never make up information."""
+- Be honest: never make up information.
+
+TALKING TO A HUMAN
+If the user asks to talk to a human, a real person, a live agent, or otherwise wants to escalate beyond what you can answer, reply with exactly ONE short sentence offering to open a support ticket so a team member can follow up — for example: "Sure — I can open a support ticket so a human can help. Want me to do that?" Never explain that you are an AI or a language model, never say you are unable to create a ticket, and do not call any tools for these requests."""
 
 _PERSONA_AUTHED = (
     _PERSONA_BASE
@@ -55,7 +58,7 @@ Answer using the knowledge base below. You can also look up the signed-in user's
 
 CRITICAL: Account state is MUTABLE. Status, balances, reply counts, and timestamps can change between turns (admins close tickets, scans land, credits get used). Treat tool results as the only source of truth for these fields. Do NOT reuse what an earlier message — yours or the user's — said about status, credits, ticket state, or scan results. Every time the user asks about a specific account fact, call the matching tool again, even if it was just asked.
 
-Do not call tools for general questions answerable from the knowledge base. Never invent data; if a tool returns nothing, say so. If a question is outside the KB and not answerable from tools, say so and offer to create a support ticket."""
+Only call a tool when the user explicitly asks about THEIR OWN account data (credits, claims, scans, tickets). Do not call tools for general questions answerable from the knowledge base, and never call a tool when the user is asking to reach a human or otherwise escalating. Never invent data; if a tool returns nothing, say so. If a question is outside the KB and not answerable from tools, say so and offer to create a support ticket."""
 )
 
 _PERSONA_ANON = (
@@ -423,6 +426,43 @@ def _is_confident(text: str, tool_was_called: bool) -> bool:
     return not any(phrase in lowered for phrase in _ESCALATION_PHRASES)
 
 
+# Phrases in the USER's message that signal an explicit request to reach a
+# human. Detected deterministically so the ticket affordance surfaces no
+# matter what the model says or whether it (spuriously) called a tool — the
+# `_is_confident` short-circuit on tool_was_called must not mask this. Keeps
+# escalation behaviour identical across model providers.
+_HUMAN_REQUEST_PHRASES = (
+    "real person",
+    "real human",
+    "real agent",
+    "talk to a human",
+    "talk to a person",
+    "talk to someone",
+    "talk to an agent",
+    "talk to a real",
+    "speak to a human",
+    "speak with a human",
+    "speak to a person",
+    "speak to someone",
+    "speak to an agent",
+    "speak with someone",
+    "live agent",
+    "live person",
+    "human agent",
+    "human representative",
+    "human being",
+    "actual person",
+    "contact support",
+    "customer service",
+    "customer support representative",
+)
+
+
+def _is_human_escalation_request(message: str) -> bool:
+    lowered = message.lower()
+    return any(phrase in lowered for phrase in _HUMAN_REQUEST_PHRASES)
+
+
 # ── Fallback copy ──────────────────────────────────────────────────────────
 
 
@@ -674,7 +714,11 @@ async def _stream_chat_anthropic(
 
         yield {
             "type": "done",
-            "confident": _is_confident(final_text, tool_was_called),
+            # An explicit "talk to a human" request must surface the ticket
+            # affordance regardless of what the model said or whether it
+            # (spuriously) called a tool — so force not-confident on intent.
+            "confident": _is_confident(final_text, tool_was_called)
+            and not _is_human_escalation_request(message),
             "final_text": final_text,
         }
 
@@ -847,7 +891,11 @@ async def _stream_chat_groq(
 
         yield {
             "type": "done",
-            "confident": _is_confident(final_text, tool_was_called),
+            # An explicit "talk to a human" request must surface the ticket
+            # affordance regardless of what the model said or whether it
+            # (spuriously) called a tool — so force not-confident on intent.
+            "confident": _is_confident(final_text, tool_was_called)
+            and not _is_human_escalation_request(message),
             "final_text": final_text,
         }
 
